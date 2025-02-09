@@ -30,15 +30,15 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
       throw new Error('End date cannot be in the future');
     }
 
-    // Check if the date range exceeds 365 days
-    const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
-    if (end - start > oneYearInMs) {
-      throw new Error('Date range cannot exceed 365 days due to API limitations. Please select a shorter time period.');
-    }
+    // Calculate date range in days
+    const daysDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    
+    // Use different intervals based on the date range
+    const interval = daysDifference > 365 ? 'd7' : 'd1';
 
     // Fetch historical data from CoinCap API
     const response = await fetch(
-      `https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=${start}&end=${end}`
+      `https://api.coincap.io/v2/assets/bitcoin/history?interval=${interval}&start=${start}&end=${end}`
     );
 
     if (!response.ok) {
