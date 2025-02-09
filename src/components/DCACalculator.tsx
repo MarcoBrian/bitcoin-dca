@@ -12,8 +12,12 @@ import { useToast } from "@/hooks/use-toast";
 import type { CalculationResult, Period } from "@/types/calculator";
 
 const DCACalculator = () => {
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  // Initialize start date to 9 years ago
+  const nineYearsAgo = new Date();
+  nineYearsAgo.setFullYear(nineYearsAgo.getFullYear() - 9);
+  
+  const [startDate, setStartDate] = useState<Date | undefined>(nineYearsAgo);
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [amount, setAmount] = useState<string>('100');
   const [period, setPeriod] = useState<Period>("monthly");
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
