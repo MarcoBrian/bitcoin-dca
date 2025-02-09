@@ -34,7 +34,26 @@
   }
 
   body {
-    @apply bg-retro-dark text-retro-orange min-h-screen font-mono antialiased;
+    @apply bg-retro-dark text-retro-orange min-h-screen font-mono antialiased relative overflow-x-hidden;
+  }
+
+  body::before {
+    content: '₿';
+    @apply fixed text-[400px] text-retro-orange/5 -z-10 animate-float pointer-events-none select-none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translate(-50%, -50%) rotate(0deg);
+      opacity: 0.05;
+    }
+    50% {
+      transform: translate(-50%, -50%) rotate(5deg);
+      opacity: 0.02;
+    }
   }
 
   .retro-card {
@@ -47,5 +66,11 @@
 
   .retro-button {
     @apply bg-retro-orange/20 hover:bg-retro-orange/30 text-retro-orange border border-retro-orange/30 rounded-md px-6 py-2 transition-all duration-200 hover:shadow-[0_0_15px_rgba(249,115,22,0.3)] active:scale-95;
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 10s ease-in-out infinite;
   }
 }
