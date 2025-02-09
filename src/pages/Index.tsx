@@ -1,11 +1,15 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import DCACalculator from "@/components/DCACalculator";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen py-12">
+      <div className="container">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Bitcoin DCA Calculator</h1>
+          <p className="text-retro-green/80">Calculate your Bitcoin investment returns using dollar-cost averaging</p>
+        </div>
+        <DCACalculator />
       </div>
     </div>
   );
