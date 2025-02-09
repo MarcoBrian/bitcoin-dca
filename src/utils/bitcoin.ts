@@ -18,8 +18,13 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const start = startDate.getTime();
     const end = endDate.getTime();
     
-    // Only validate that end date is not in the future
+    // Only validate date range
     const now = Date.now();
+    const bitcoinInception = new Date('2009-01-03').getTime();
+    
+    if (start < bitcoinInception) {
+      throw new Error('Start date cannot be before Bitcoin inception (January 3, 2009)');
+    }
     
     if (end > now) {
       throw new Error('End date cannot be in the future');

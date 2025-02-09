@@ -21,15 +21,16 @@ export const DateSelection = ({
   const [startDateInput, setStartDateInput] = useState(startDate ? format(startDate, "yyyy-MM-dd") : "");
   const [endDateInput, setEndDateInput] = useState(endDate ? format(endDate, "yyyy-MM-dd") : "");
 
-  // Calculate date limits - only limit the end date to today
+  // Calculate date limits
   const maxEndDate = new Date();
+  const minStartDate = new Date('2009-01-03'); // Bitcoin inception date
 
   const handleStartDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setStartDateInput(inputValue);
     try {
       const date = parse(inputValue, "yyyy-MM-dd", new Date());
-      if (!isNaN(date.getTime()) && date <= maxEndDate) {
+      if (!isNaN(date.getTime()) && date >= minStartDate && date <= maxEndDate) {
         setStartDate(date);
       }
     } catch (error) {
@@ -42,7 +43,7 @@ export const DateSelection = ({
     setEndDateInput(inputValue);
     try {
       const date = parse(inputValue, "yyyy-MM-dd", new Date());
-      if (!isNaN(date.getTime()) && date <= maxEndDate) {
+      if (!isNaN(date.getTime()) && date >= minStartDate && date <= maxEndDate) {
         setEndDate(date);
       }
     } catch (error) {
@@ -53,13 +54,14 @@ export const DateSelection = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <label className="block text-sm">Start Date</label>
+        <label className="block text-sm">Start Date (since Jan 3, 2009)</label>
         <Popover>
           <PopoverTrigger className="retro-input w-full flex items-center justify-between">
             <input
               type="date"
               value={startDateInput}
               onChange={handleStartDateInput}
+              min={format(minStartDate, "yyyy-MM-dd")}
               max={format(maxEndDate, "yyyy-MM-dd")}
               className="bg-transparent border-none outline-none w-full"
             />
@@ -82,6 +84,7 @@ export const DateSelection = ({
               }}
               disabled={(date) => 
                 date > maxEndDate || 
+                date < minStartDate || 
                 (endDate ? date > endDate : false)
               }
               className="bg-transparent"
@@ -98,6 +101,7 @@ export const DateSelection = ({
               type="date"
               value={endDateInput}
               onChange={handleEndDateInput}
+              min={format(minStartDate, "yyyy-MM-dd")}
               max={format(maxEndDate, "yyyy-MM-dd")}
               className="bg-transparent border-none outline-none w-full"
             />
@@ -120,6 +124,7 @@ export const DateSelection = ({
               }}
               disabled={(date) => 
                 date > maxEndDate || 
+                date < minStartDate || 
                 (startDate ? date < startDate : false)
               }
               className="bg-transparent"
