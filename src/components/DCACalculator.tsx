@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format, differenceInDays, differenceInWeeks, differenceInMonths } from "date-fns";
+import { format, differenceInDays, differenceInWeeks, differenceInMonths, addDays, addWeeks, addMonths } from "date-fns";
 import { Calendar as CalendarIcon, Bitcoin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -20,6 +20,16 @@ const fetchBitcoinPrice = async () => {
   return data.bitcoin.usd;
 };
 
+const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
+  const start = Math.floor(startDate.getTime() / 1000);
+  const end = Math.floor(endDate.getTime() / 1000);
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${start}&to=${end}`
+  );
+  const data = await response.json();
+  return data.prices;
+};
+
 const DCACalculator = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -30,6 +40,7 @@ const DCACalculator = () => {
     estimatedBitcoin: number;
     currentValue: number;
     roi: number;
+    averageBuyPrice: number;
   } | null>(null);
 
   const { data: bitcoinPrice, isLoading: isPriceLoading } = useQuery({
@@ -38,38 +49,74 @@ const DCACalculator = () => {
     refetchInterval: 60000, // Refresh every minute
   });
 
-  const handleCalculate = () => {
-    if (!startDate || !endDate || !amount || !bitcoinPrice) return;
+  const { data: historicalPrices, isLoading: isHistoricalLoading } = useQuery({
+    queryKey: ['historicalPrices', startDate?.getTime(), endDate?.getTime()],
+    queryFn: () => startDate && endDate ? fetchHistoricalPrices(startDate, endDate) : null,
+    enabled: !!startDate && !!endDate,
+  });
 
-    let numberOfInvestments = 0;
-    const investmentAmount = parseFloat(amount);
+  const getInvestmentDates = (start: Date, end: Date, periodType: string): Date[] => {
+    const dates: Date[] = [];
+    let currentDate = start;
 
-    // Calculate number of investments based on period
-    switch (period) {
-      case "daily":
-        numberOfInvestments = differenceInDays(endDate, startDate) + 1;
-        break;
-      case "weekly":
-        numberOfInvestments = differenceInWeeks(endDate, startDate) + 1;
-        break;
-      case "monthly":
-        numberOfInvestments = differenceInMonths(endDate, startDate) + 1;
-        break;
-      case "one-time":
-        numberOfInvestments = 1;
-        break;
+    while (currentDate <= end) {
+      dates.push(new Date(currentDate));
+      switch (periodType) {
+        case "daily":
+          currentDate = addDays(currentDate, 1);
+          break;
+        case "weekly":
+          currentDate = addWeeks(currentDate, 1);
+          break;
+        case "monthly":
+          currentDate = addMonths(currentDate, 1);
+          break;
+        case "one-time":
+          currentDate = new Date(end.getTime() + 1);
+          break;
+      }
     }
+    return dates;
+  };
 
-    const totalInvested = investmentAmount * numberOfInvestments;
-    const estimatedBitcoin = totalInvested / bitcoinPrice;
-    const currentValue = estimatedBitcoin * bitcoinPrice;
+  const findClosestPrice = (timestamp: number, prices: [number, number][]) => {
+    return prices.reduce((closest, current) => {
+      const currentDiff = Math.abs(current[0] - timestamp);
+      const closestDiff = Math.abs(closest[0] - timestamp);
+      return currentDiff < closestDiff ? current : closest;
+    })[1];
+  };
+
+  const handleCalculate = () => {
+    if (!startDate || !endDate || !amount || !bitcoinPrice || !historicalPrices) return;
+
+    const investmentAmount = parseFloat(amount);
+    const investmentDates = getInvestmentDates(startDate, endDate, period);
+    
+    let totalBitcoin = 0;
+    let totalInvested = 0;
+    let totalHistoricalValue = 0;
+
+    investmentDates.forEach(date => {
+      const timestamp = date.getTime();
+      const historicalPrice = findClosestPrice(timestamp, historicalPrices);
+      
+      const btcPurchased = investmentAmount / historicalPrice;
+      totalBitcoin += btcPurchased;
+      totalInvested += investmentAmount;
+      totalHistoricalValue += investmentAmount;
+    });
+
+    const currentValue = totalBitcoin * bitcoinPrice;
     const roi = ((currentValue - totalInvested) / totalInvested) * 100;
+    const averageBuyPrice = totalInvested / totalBitcoin;
 
     setCalculationResult({
       totalInvested,
-      estimatedBitcoin,
+      estimatedBitcoin: totalBitcoin,
       currentValue,
-      roi
+      roi,
+      averageBuyPrice
     });
   };
 
@@ -168,9 +215,10 @@ const DCACalculator = () => {
           {/* Calculate Button */}
           <button
             onClick={handleCalculate}
+            disabled={isHistoricalLoading}
             className="retro-button w-full mt-6"
           >
-            Calculate Returns
+            {isHistoricalLoading ? "Loading Historical Data..." : "Calculate Returns"}
           </button>
 
           {/* Results Section */}
@@ -195,6 +243,10 @@ const DCACalculator = () => {
                   <p className={`text-lg font-bold ${calculationResult.roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {calculationResult.roi.toFixed(2)}%
                   </p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm opacity-80">Average Buy Price</p>
+                  <p className="text-lg font-bold">${calculationResult.averageBuyPrice.toLocaleString()}</p>
                 </div>
               </div>
             </div>
