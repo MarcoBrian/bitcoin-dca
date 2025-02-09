@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DateSelection } from "./calculator/DateSelection";
 import { InvestmentDetails } from "./calculator/InvestmentDetails";
 import { Results } from "./calculator/Results";
+import { InvestmentChart } from "./calculator/InvestmentChart";
 import { fetchBitcoinPrice, fetchHistoricalPrices } from "@/utils/bitcoin";
 import { calculateInvestmentResults } from "@/utils/calculations";
 import type { CalculationResult, Period } from "@/types/calculator";
@@ -44,7 +45,7 @@ const DCACalculator = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
       <div className="retro-card space-y-6">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold tracking-tight">Bitcoin DCA Calculator</h2>
@@ -86,6 +87,16 @@ const DCACalculator = () => {
           </button>
 
           {calculationResult && <Results result={calculationResult} />}
+          
+          {startDate && endDate && historicalPrices && amount && (
+            <InvestmentChart
+              startDate={startDate}
+              endDate={endDate}
+              amount={parseFloat(amount)}
+              period={period}
+              historicalPrices={historicalPrices}
+            />
+          )}
         </div>
       </div>
     </div>
