@@ -8,6 +8,7 @@ import { Results } from "./calculator/Results";
 import { InvestmentChart } from "./calculator/InvestmentChart";
 import { fetchBitcoinPrice, fetchHistoricalPrices } from "@/utils/bitcoin";
 import { calculateInvestmentResults } from "@/utils/calculations";
+import { useToast } from "@/hooks/use-toast";
 import type { CalculationResult, Period } from "@/types/calculator";
 
 const DCACalculator = () => {
@@ -16,6 +17,7 @@ const DCACalculator = () => {
   const [amount, setAmount] = useState<string>('100');
   const [period, setPeriod] = useState<Period>("monthly");
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
+  const { toast } = useToast();
 
   const { data: bitcoinPrice, isLoading: isPriceLoading } = useQuery({
     queryKey: ['bitcoinPrice'],
@@ -30,7 +32,16 @@ const DCACalculator = () => {
   });
 
   const handleCalculate = () => {
-    if (!startDate || !endDate || !amount || !bitcoinPrice || !historicalPrices) return;
+    if (!startDate || !endDate) {
+      toast({
+        title: "Date Selection Required",
+        description: "Please select both start and end dates before calculating returns.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!amount || !bitcoinPrice || !historicalPrices) return;
 
     const result = calculateInvestmentResults(
       startDate,
