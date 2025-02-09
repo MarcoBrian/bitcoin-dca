@@ -54,8 +54,8 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         retro: {
-          green: "#00ff9c",
-          amber: "#ffb000",
+          orange: "#F97316",
+          'orange-soft': "#FEC6A1",
           dark: "#1a1b1f",
           light: "#f0f0f0",
         },

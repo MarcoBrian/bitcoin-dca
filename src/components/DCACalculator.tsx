@@ -42,7 +42,7 @@ const DCACalculator = () => {
       <div className="retro-card space-y-6">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold tracking-tight">Bitcoin DCA Calculator</h2>
-          <Bitcoin className="w-8 h-8 text-retro-green animate-glow" />
+          <Bitcoin className="w-8 h-8 text-retro-orange animate-glow" />
         </div>
 
         <div className="space-y-4">
@@ -55,7 +55,7 @@ const DCACalculator = () => {
                   {startDate ? format(startDate, "PPP") : "Select date"}
                   <CalendarIcon className="h-4 w-4 opacity-50" />
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-black/90 border-retro-green/30">
+                <PopoverContent className="w-auto p-0 bg-black/90 border-retro-orange/30">
                   <Calendar
                     mode="single"
                     selected={startDate}
@@ -74,7 +74,7 @@ const DCACalculator = () => {
                   {endDate ? format(endDate, "PPP") : "Select date"}
                   <CalendarIcon className="h-4 w-4 opacity-50" />
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-black/90 border-retro-green/30">
+                <PopoverContent className="w-auto p-0 bg-black/90 border-retro-orange/30">
                   <Calendar
                     mode="single"
                     selected={endDate}
@@ -107,9 +107,9 @@ const DCACalculator = () => {
               <SelectTrigger className="retro-input w-full">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
-              <SelectContent className="bg-black/90 border-retro-green/30">
+              <SelectContent className="bg-black/90 border-retro-orange/30">
                 {PERIODS.map((p) => (
-                  <SelectItem key={p.value} value={p.value} className="text-retro-green hover:bg-retro-green/20">
+                  <SelectItem key={p.value} value={p.value} className="text-retro-orange hover:bg-retro-orange/20">
                     {p.label}
                   </SelectItem>
                 ))}
@@ -118,7 +118,7 @@ const DCACalculator = () => {
           </div>
 
           {/* Current Bitcoin Price */}
-          <div className="p-4 border border-retro-green/20 rounded-md bg-black/20">
+          <div className="p-4 border border-retro-orange/20 rounded-md bg-black/20">
             <p className="text-sm opacity-80">Current Bitcoin Price</p>
             <p className="text-xl font-bold">
               {isPriceLoading ? (
