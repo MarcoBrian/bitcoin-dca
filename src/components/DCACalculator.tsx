@@ -16,8 +16,11 @@ const DCACalculator = () => {
   const nineYearsAgo = new Date();
   nineYearsAgo.setFullYear(nineYearsAgo.getFullYear() - 9);
   
+  // Initialize end date to today
+  const today = new Date();
+  
   const [startDate, setStartDate] = useState<Date | undefined>(nineYearsAgo);
-  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>(today);
   const [amount, setAmount] = useState<string>('100');
   const [period, setPeriod] = useState<Period>("monthly");
   const [calculationResult, setCalculationResult] = useState<CalculationResult | null>(null);
