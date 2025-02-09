@@ -18,7 +18,7 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const start = startDate.getTime();
     const end = endDate.getTime();
     
-    // Only validate date range
+    // Validate date range
     const now = Date.now();
     const bitcoinInception = new Date('2009-01-03').getTime();
     
@@ -30,13 +30,20 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
       throw new Error('End date cannot be in the future');
     }
 
+    // Check if the date range exceeds 365 days
+    const oneYearInMs = 365 * 24 * 60 * 60 * 1000;
+    if (end - start > oneYearInMs) {
+      throw new Error('Date range cannot exceed 365 days due to API limitations. Please select a shorter time period.');
+    }
+
     // Fetch historical data from CoinCap API
     const response = await fetch(
       `https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=${start}&end=${end}`
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
