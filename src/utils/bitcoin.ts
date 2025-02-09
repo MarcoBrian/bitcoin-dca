@@ -18,12 +18,12 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const start = startDate.getTime();
     const end = endDate.getTime();
     
-    // Validate date range
+    // Set minimum date to 2013 (11 years ago from now)
+    const minStartDate = new Date('2013-01-01').getTime();
     const now = Date.now();
-    const bitcoinInception = new Date('2009-01-03').getTime();
     
-    if (start < bitcoinInception) {
-      throw new Error('Start date cannot be before Bitcoin inception (January 3, 2009)');
+    if (start < minStartDate) {
+      throw new Error('CoinCap API only provides historical data from 2013 onwards');
     }
     
     if (end > now) {
