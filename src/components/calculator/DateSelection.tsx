@@ -1,7 +1,7 @@
 
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format, parse } from "date-fns";
+import { format, parse, subDays } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -21,11 +21,16 @@ export const DateSelection = ({
   const [startDateInput, setStartDateInput] = useState(startDate ? format(startDate, "yyyy-MM-dd") : "");
   const [endDateInput, setEndDateInput] = useState(endDate ? format(endDate, "yyyy-MM-dd") : "");
 
+  // Calculate date limits
+  const maxEndDate = new Date();
+  const minStartDate = subDays(maxEndDate, 364); // 365 days ago
+
   const handleStartDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setStartDateInput(e.target.value);
+    const inputValue = e.target.value;
+    setStartDateInput(inputValue);
     try {
-      const date = parse(e.target.value, "yyyy-MM-dd", new Date());
-      if (!isNaN(date.getTime())) {
+      const date = parse(inputValue, "yyyy-MM-dd", new Date());
+      if (!isNaN(date.getTime()) && date >= minStartDate && date <= maxEndDate) {
         setStartDate(date);
       }
     } catch (error) {
@@ -34,10 +39,11 @@ export const DateSelection = ({
   };
 
   const handleEndDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEndDateInput(e.target.value);
+    const inputValue = e.target.value;
+    setEndDateInput(inputValue);
     try {
-      const date = parse(e.target.value, "yyyy-MM-dd", new Date());
-      if (!isNaN(date.getTime())) {
+      const date = parse(inputValue, "yyyy-MM-dd", new Date());
+      if (!isNaN(date.getTime()) && date >= minStartDate && date <= maxEndDate) {
         setEndDate(date);
       }
     } catch (error) {
@@ -48,13 +54,15 @@ export const DateSelection = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <label className="block text-sm">Start Date</label>
+        <label className="block text-sm">Start Date (max 1 year ago)</label>
         <Popover>
           <PopoverTrigger className="retro-input w-full flex items-center justify-between">
             <input
               type="date"
               value={startDateInput}
               onChange={handleStartDateInput}
+              min={format(minStartDate, "yyyy-MM-dd")}
+              max={format(maxEndDate, "yyyy-MM-dd")}
               className="bg-transparent border-none outline-none w-full"
             />
             <CalendarIcon className="h-4 w-4 opacity-50 flex-shrink-0" />
@@ -74,7 +82,11 @@ export const DateSelection = ({
                   setStartDateInput(format(date, "yyyy-MM-dd"));
                 }
               }}
-              disabled={(date) => date > new Date() || (endDate ? date > endDate : false)}
+              disabled={(date) => 
+                date > maxEndDate || 
+                date < minStartDate || 
+                (endDate ? date > endDate : false)
+              }
               className="bg-transparent"
             />
           </PopoverContent>
@@ -89,6 +101,8 @@ export const DateSelection = ({
               type="date"
               value={endDateInput}
               onChange={handleEndDateInput}
+              min={format(minStartDate, "yyyy-MM-dd")}
+              max={format(maxEndDate, "yyyy-MM-dd")}
               className="bg-transparent border-none outline-none w-full"
             />
             <CalendarIcon className="h-4 w-4 opacity-50 flex-shrink-0" />
@@ -108,7 +122,11 @@ export const DateSelection = ({
                   setEndDateInput(format(date, "yyyy-MM-dd"));
                 }
               }}
-              disabled={(date) => date > new Date() || (startDate ? date < startDate : false)}
+              disabled={(date) => 
+                date > maxEndDate || 
+                date < minStartDate || 
+                (startDate ? date < startDate : false)
+              }
               className="bg-transparent"
             />
           </PopoverContent>
