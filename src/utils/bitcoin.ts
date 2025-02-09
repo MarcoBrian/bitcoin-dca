@@ -18,12 +18,14 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const start = startDate.getTime();
     const end = endDate.getTime();
     
-    // Set minimum date to 2013 (11 years ago from now)
-    const minStartDate = new Date('2013-01-01').getTime();
+    // Calculate minimum date (11 years from now)
+    const elevenYearsAgo = new Date();
+    elevenYearsAgo.setFullYear(elevenYearsAgo.getFullYear() - 11);
+    const minStartDate = elevenYearsAgo.getTime();
     const now = Date.now();
     
     if (start < minStartDate) {
-      throw new Error('CoinCap API only provides historical data from 2013 onwards');
+      throw new Error('CoinCap API only provides historical data for the last 11 years');
     }
     
     if (end > now) {

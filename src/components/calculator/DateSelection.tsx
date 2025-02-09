@@ -23,7 +23,9 @@ export const DateSelection = ({
 
   // Calculate date limits
   const maxEndDate = new Date();
-  const minStartDate = new Date('2013-01-01'); // Updated to 2013
+  const elevenYearsAgo = new Date();
+  elevenYearsAgo.setFullYear(elevenYearsAgo.getFullYear() - 11);
+  const minStartDate = elevenYearsAgo;
 
   const handleStartDateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -54,7 +56,7 @@ export const DateSelection = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <div className="space-y-2">
-        <label className="block text-sm">Start Date (since Jan 1, 2013)</label>
+        <label className="block text-sm">Start Date (last 11 years)</label>
         <Popover>
           <PopoverTrigger className="retro-input w-full flex items-center justify-between">
             <input
