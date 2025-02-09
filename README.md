@@ -3,6 +3,7 @@
 ## Project info
 
 **URL**: https://lovable.dev/projects/dd824cb8-973f-499a-81d9-ddca4ba352be
+Live at: https://bitcoin-dca.lovable.app/
 
 ## How can I edit this code?
 
