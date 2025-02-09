@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { format } from "date-fns";
+import { format, differenceInDays, differenceInWeeks, differenceInMonths } from "date-fns";
 import { Calendar as CalendarIcon, Bitcoin } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -25,6 +25,12 @@ const DCACalculator = () => {
   const [endDate, setEndDate] = useState<Date>();
   const [amount, setAmount] = useState<string>('100');
   const [period, setPeriod] = useState<string>("monthly");
+  const [calculationResult, setCalculationResult] = useState<{
+    totalInvested: number;
+    estimatedBitcoin: number;
+    currentValue: number;
+    roi: number;
+  } | null>(null);
 
   const { data: bitcoinPrice, isLoading: isPriceLoading } = useQuery({
     queryKey: ['bitcoinPrice'],
@@ -33,8 +39,38 @@ const DCACalculator = () => {
   });
 
   const handleCalculate = () => {
-    if (!startDate || !endDate || !amount) return;
-    // Calculation logic will be implemented in the next iteration
+    if (!startDate || !endDate || !amount || !bitcoinPrice) return;
+
+    let numberOfInvestments = 0;
+    const investmentAmount = parseFloat(amount);
+
+    // Calculate number of investments based on period
+    switch (period) {
+      case "daily":
+        numberOfInvestments = differenceInDays(endDate, startDate) + 1;
+        break;
+      case "weekly":
+        numberOfInvestments = differenceInWeeks(endDate, startDate) + 1;
+        break;
+      case "monthly":
+        numberOfInvestments = differenceInMonths(endDate, startDate) + 1;
+        break;
+      case "one-time":
+        numberOfInvestments = 1;
+        break;
+    }
+
+    const totalInvested = investmentAmount * numberOfInvestments;
+    const estimatedBitcoin = totalInvested / bitcoinPrice;
+    const currentValue = estimatedBitcoin * bitcoinPrice;
+    const roi = ((currentValue - totalInvested) / totalInvested) * 100;
+
+    setCalculationResult({
+      totalInvested,
+      estimatedBitcoin,
+      currentValue,
+      roi
+    });
   };
 
   return (
@@ -136,6 +172,33 @@ const DCACalculator = () => {
           >
             Calculate Returns
           </button>
+
+          {/* Results Section */}
+          {calculationResult && (
+            <div className="mt-8 space-y-4 border border-retro-orange/20 rounded-md p-4 bg-black/20">
+              <h3 className="text-xl font-bold mb-4">Investment Summary</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm opacity-80">Total Invested</p>
+                  <p className="text-lg font-bold">${calculationResult.totalInvested.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm opacity-80">Current Value</p>
+                  <p className="text-lg font-bold">${calculationResult.currentValue.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm opacity-80">Estimated Bitcoin</p>
+                  <p className="text-lg font-bold">{calculationResult.estimatedBitcoin.toFixed(8)} BTC</p>
+                </div>
+                <div>
+                  <p className="text-sm opacity-80">Return on Investment</p>
+                  <p className={`text-lg font-bold ${calculationResult.roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {calculationResult.roi.toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
