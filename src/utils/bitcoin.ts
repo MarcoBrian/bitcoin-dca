@@ -1,12 +1,12 @@
 
 export const fetchBitcoinPrice = async () => {
   try {
-    const response = await fetch('https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD');
+    const response = await fetch('https://api.coincap.io/v2/assets/bitcoin');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    return data.USD;
+    return parseFloat(data.data.priceUsd);
   } catch (error) {
     console.error('Error fetching Bitcoin price:', error);
     throw error;
@@ -15,12 +15,12 @@ export const fetchBitcoinPrice = async () => {
 
 export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
   try {
-    const start = Math.floor(startDate.getTime() / 1000);
-    const end = Math.floor(endDate.getTime() / 1000);
+    const start = startDate.getTime();
+    const end = endDate.getTime();
     
     // Validate date range
-    const now = Math.floor(Date.now() / 1000);
-    const oneYearAgo = now - (365 * 24 * 60 * 60);
+    const now = Date.now();
+    const oneYearAgo = now - (365 * 24 * 60 * 60 * 1000);
     
     if (start < oneYearAgo) {
       throw new Error('Start date cannot be more than 1 year ago');
@@ -30,9 +30,9 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
       throw new Error('End date cannot be in the future');
     }
 
-    // Get daily historical data
+    // Fetch historical data from CoinCap API
     const response = await fetch(
-      `https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&toTs=${end}&limit=365`
+      `https://api.coincap.io/v2/assets/bitcoin/history?interval=d1&start=${start}&end=${end}`
     );
 
     if (!response.ok) {
@@ -42,9 +42,9 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const data = await response.json();
     
     // Transform the data to match the expected format [timestamp, price]
-    const prices = data.Data.Data.map((item: { time: number; close: number; }) => [
-      item.time * 1000, // Convert to milliseconds
-      item.close
+    const prices = data.data.map((item: { time: number; priceUsd: string; }) => [
+      item.time,
+      parseFloat(item.priceUsd)
     ]);
 
     // Filter prices within the requested date range
