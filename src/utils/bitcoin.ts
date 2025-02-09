@@ -18,13 +18,8 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
     const start = startDate.getTime();
     const end = endDate.getTime();
     
-    // Validate date range
+    // Only validate that end date is not in the future
     const now = Date.now();
-    const oneYearAgo = now - (365 * 24 * 60 * 60 * 1000);
-    
-    if (start < oneYearAgo) {
-      throw new Error('Start date cannot be more than 1 year ago');
-    }
     
     if (end > now) {
       throw new Error('End date cannot be in the future');
