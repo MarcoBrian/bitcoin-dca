@@ -30,11 +30,8 @@ export const fetchHistoricalPrices = async (startDate: Date, endDate: Date) => {
       throw new Error('End date cannot be in the future');
     }
 
-    // Calculate date range in days
-    const daysDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    
-    // Use different intervals based on the date range
-    const interval = daysDifference > 365 ? 'd7' : 'd1';
+    // Always use daily intervals as it's the largest supported interval
+    const interval = 'd1';
 
     // Fetch historical data from CoinCap API
     const response = await fetch(
