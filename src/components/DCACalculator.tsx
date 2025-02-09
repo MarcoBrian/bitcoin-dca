@@ -47,9 +47,20 @@ const DCACalculator = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="retro-card space-y-6">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold tracking-tight">Bitcoin DCA Calculator</h2>
           <Bitcoin className="w-8 h-8 text-retro-orange animate-glow" />
+        </div>
+
+        <div className="p-4 border border-retro-orange/20 rounded-md bg-black/20">
+          <p className="text-sm opacity-80">Current Bitcoin Price</p>
+          <p className="text-xl font-bold">
+            {isPriceLoading ? (
+              "Loading..."
+            ) : (
+              `$${bitcoinPrice?.toLocaleString() ?? "Error"}`
+            )}
+          </p>
         </div>
 
         <div className="space-y-4">
@@ -66,17 +77,6 @@ const DCACalculator = () => {
             period={period}
             setPeriod={setPeriod}
           />
-
-          <div className="p-4 border border-retro-orange/20 rounded-md bg-black/20">
-            <p className="text-sm opacity-80">Current Bitcoin Price</p>
-            <p className="text-xl font-bold">
-              {isPriceLoading ? (
-                "Loading..."
-              ) : (
-                `$${bitcoinPrice?.toLocaleString() ?? "Error"}`
-              )}
-            </p>
-          </div>
 
           <button
             onClick={handleCalculate}
