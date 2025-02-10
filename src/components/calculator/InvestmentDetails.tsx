@@ -33,10 +33,10 @@ export const InvestmentDetails = ({
       <div className="space-y-2">
         <label className="block text-sm">Investment Period</label>
         <Select value={period} onValueChange={(value) => setPeriod(value as Period)}>
-          <SelectTrigger className="retro-input w-full">
+          <SelectTrigger className="retro-input w-full bg-black/60 border-retro-orange/30 text-retro-orange">
             <SelectValue placeholder="Select period" />
           </SelectTrigger>
-          <SelectContent className="bg-black/90 border-retro-orange/30">
+          <SelectContent className="bg-black/90 border border-retro-orange/30">
             {PERIODS.map((p) => (
               <SelectItem 
                 key={p.value} 
@@ -52,3 +52,4 @@ export const InvestmentDetails = ({
     </>
   );
 };
+

@@ -1,5 +1,5 @@
 
-export type Period = "daily" | "weekly" | "monthly" | "one-time";
+export type Period = "weekly" | "monthly" | "one-time";
 
 export interface CalculationResult {
   totalInvested: number;
@@ -10,8 +10,8 @@ export interface CalculationResult {
 }
 
 export const PERIODS = [
-  { value: "daily", label: "Daily" },
   { value: "weekly", label: "Weekly" },
   { value: "monthly", label: "Monthly" },
   { value: "one-time", label: "One Time Purchase" },
 ] as const;
+

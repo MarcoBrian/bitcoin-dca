@@ -1,4 +1,4 @@
-import { addDays, addWeeks, addMonths } from "date-fns";
+import { addWeeks, addMonths } from "date-fns";
 import { Period } from "../types/calculator";
 import { findClosestPrice } from "./bitcoin";
 
@@ -7,26 +7,9 @@ export const getInvestmentDates = (start: Date, end: Date, periodType: Period): 
   let currentDate = new Date(start);
   const endTime = end.getTime();
 
-  // For daily periods, limit to a maximum of 365 data points to prevent freezing
-  if (periodType === "daily") {
-    const daysDiff = Math.floor((endTime - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-    if (daysDiff > 365) {
-      // If more than a year, sample every few days to keep total points under 365
-      const skipDays = Math.ceil(daysDiff / 365);
-      while (currentDate.getTime() <= endTime) {
-        dates.push(new Date(currentDate));
-        currentDate = addDays(currentDate, skipDays);
-      }
-      return dates;
-    }
-  }
-
   while (currentDate.getTime() <= endTime) {
     dates.push(new Date(currentDate));
     switch (periodType) {
-      case "daily":
-        currentDate = addDays(currentDate, 1);
-        break;
       case "weekly":
         currentDate = addWeeks(currentDate, 1);
         break;
