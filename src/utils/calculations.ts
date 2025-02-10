@@ -5,7 +5,7 @@ import { findClosestPrice } from "./bitcoin";
 
 export const getInvestmentDates = (start: Date, end: Date, periodType: Period): Date[] => {
   const dates: Date[] = [];
-  let currentDate = start;
+  let currentDate = new Date(start);
 
   while (currentDate <= end) {
     dates.push(new Date(currentDate));
@@ -39,7 +39,6 @@ export const calculateInvestmentResults = (
   
   let totalBitcoin = 0;
   let totalInvested = 0;
-  let totalHistoricalValue = 0;
 
   investmentDates.forEach(date => {
     const timestamp = date.getTime();
@@ -48,7 +47,6 @@ export const calculateInvestmentResults = (
     const btcPurchased = investmentAmount / historicalPrice;
     totalBitcoin += btcPurchased;
     totalInvested += investmentAmount;
-    totalHistoricalValue += investmentAmount;
   });
 
   const currentValue = totalBitcoin * bitcoinPrice;
